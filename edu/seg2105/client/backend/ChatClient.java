@@ -71,13 +71,92 @@ public class ChatClient extends AbstractClient
   {
     try
     {
-      sendToServer(message);
+      if(message.charAt(0) == '#')
+      {
+        handleCommand(message);
+      }
+      else
+      {
+        sendToServer(message);
+      }
+      
     }
     catch(IOException e)
     {
       clientUI.display
         ("Could not send message to server.  Terminating client.");
       quit();
+    }
+  }
+
+  private void handleCommand(String command)
+  {
+    String argument = "";
+    try
+    {
+      argument = command.split(" ")[1];
+    } catch(ArrayIndexOutOfBoundsException e)
+    {
+    }
+    command = command.split(" ")[0];
+
+    switch (command) {
+      case "#quit":
+        this.quit();
+        break;
+      case "#logoff":
+        if(this.isConnected()) 
+        {
+          try{
+          this.closeConnection();
+          } catch (IOException e)
+          {
+            clientUI.display("fail on close: " + e);
+            this.quit();
+          }
+        }
+        break;
+      case "#sethost":
+        if(!this.isConnected())
+        {
+          this.setHost(argument);
+        } else { clientUI.display("must be logged out first!"); }
+        break;
+      case "#setport":
+        if(!this.isConnected()) { this.setPort(Integer.parseInt(argument)); }
+        else { clientUI.display("must be logged out first!"); }
+        break;
+      case "#login":
+        if(!this.isConnected()) 
+        {
+          try
+          {
+            this.openConnection();
+          } catch (IOException e)
+          {
+            clientUI.display("failed to open connection: " + e);
+            this.quit();
+          }
+        } else { clientUI.display("you are already logged in!");}
+        break;
+      case "#gethost":
+        clientUI.display(this.getHost());
+        break;
+      case "#getport":
+        clientUI.display(Integer.toString(getPort()));
+        break;
+      case "#help":
+        clientUI.display("#quit            closes the chat program");
+        clientUI.display("#logoff          disconnect from the server without quitting");
+        clientUI.display("#sethost <host>  sets the host if not currently connected");
+        clientUI.display("#setport <port>  sets the port if not currently connected");
+        clientUI.display("#login           connect to the server");
+        clientUI.display("#gethost         displays the current host");
+        clientUI.display("#getport         displays the current port");
+        break;
+      default:
+        clientUI.display("unknown command, type #help to view a list of commands");
+        break;
     }
   }
   
