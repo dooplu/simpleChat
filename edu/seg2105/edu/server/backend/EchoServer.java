@@ -55,11 +55,12 @@ public class EchoServer extends AbstractServer
     (Object msg, ConnectionToClient client)
   {
     String message = msg.toString();
-    System.out.println("Message received: " + msg + " from " + client);
+    System.out.println("Message received: " + msg + " from " + client.getInfo(loginKey));
     if(message.startsWith("#login") && !loginReceived)
     {
       String loginID = message.split(" ")[1];
       client.setInfo(loginKey, loginID);
+      System.out.println(client.getInfo(loginKey) + " has logged on");
       loginReceived = true;
     } else if(message.startsWith("#login") && loginReceived)
     {
@@ -72,9 +73,11 @@ public class EchoServer extends AbstractServer
       }
       
     }
-    {
-      this.sendToAllClients((String)client.getInfo(loginKey) + ": " + msg);
-    }
+      else
+      {
+        this.sendToAllClients((String)client.getInfo(loginKey) + ": " + msg);
+      }
+    
   }
     
   /**
