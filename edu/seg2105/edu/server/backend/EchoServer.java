@@ -26,6 +26,8 @@ public class EchoServer extends AbstractServer
    */
   final public static int DEFAULT_PORT = 5555;
   ChatIF serverUI;
+  String loginKey = "id";
+  boolean loginReceived = false;
   
   //Constructors ****************************************************
   
@@ -52,8 +54,27 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
+    String message = msg.toString();
     System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+    if(message.startsWith("#login") && !loginReceived)
+    {
+      String loginID = message.split(" ")[1];
+      client.setInfo(loginKey, loginID);
+      loginReceived = true;
+    } else if(message.startsWith("#login") && loginReceived)
+    {
+      try {
+        client.sendToClient("you have already logged in!");
+        client.close();
+      } catch (IOException e) {
+        serverUI.display("failed to close client");
+        serverUI.display(e.toString());
+      }
+      
+    }
+    {
+      this.sendToAllClients((String)client.getInfo(loginKey) + ": " + msg);
+    }
   }
     
   /**
