@@ -54,7 +54,7 @@ public class ClientConsole implements ChatIF
   {
     try 
     {
-      client= new ChatClient(host, port, this);
+      client = new ChatClient(host, port, this);
       
       
     } 
@@ -128,7 +128,7 @@ public class ClientConsole implements ChatIF
     {
       host = "localhost";
     }
-    
+
     // we implement a try-catch for the port alone as the user may have properly inputted the port and not the host, or vice-versa
     try 
     {
